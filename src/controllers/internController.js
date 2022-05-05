@@ -23,8 +23,10 @@ const interns = async function(req,res){
         if(!isValidRequestBody(details))
         return res.status(400).send({status:false, msg:"Please fill Intern details"})
 
+        //Ectract params
         const {name, email, mobile, collegeId} = details 
 
+        //Validation start
         if(!isValid(name))
         res.status(400).send({staus:false, msg:"Name is Required"})
 
@@ -39,9 +41,9 @@ const interns = async function(req,res){
         return res.status(400).send({status:false, msg:"This mail is already exist"})
 
         if(!isValid(mobile))
-        return res.status(400).send({status:false, msg:"Please enter mobile no"})
+        return res.status(400).send({status:false, msg:"Mobile no is Required"})
         //check for valid mobile no
-        if(!mobile.match(/^(\+\d{1,3}[- ]?)?\d{10}$/))
+        if(!(/^[6-9]\d{9}$/.test(mobile)))
         return res.status(400).send({status:false, msg:"Please enter valid mobile number"})
         //check for unique mob no
         let mob = await internModel.findOne({mobile})
@@ -50,16 +52,18 @@ const interns = async function(req,res){
 
         if(!isValid(collegeId))
         return res.status(400).send({status:false, msg :"CollegeId is Required"})
+        //check for valid collegeId
         if(!isValidObjectId(collegeId))
         return res.status(400).send({status:false, msg:"Please enter valid collegeId"})
-        //check for valid collegeId
+        // Check for existing collegeId in DB
         let collegeData = details.collegeId
         let collegenum = await collegeModel.findById(collegeData)
         if(!collegenum)
         return res.status(400).send({status:false, msg:"college id is not exists"})
+        // Validation ends
 
         const createdIntern = await internModel.create(details)
-        res.status(201).send({status:true, data:createdIntern})
+        res.status(201).send({status:true, message:"Intern created successfully",data:createdIntern})
     }
     catch(err)
     {

@@ -38,16 +38,13 @@ const colleges = async function(req,res){
         if(!isValid(logoLink))
         return res.status(400).send({status:false, msg:"LogoLink is Required"})
         if(!(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%.\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%\+.~#?&//=]*)/.test(logoLink)))        
-        return res.status(400).send({ status: false, msg: "logoLink is invalid" })
-            
-        
+        return res.status(400).send({ status: false, msg: "logoLink is invalid" })       
         //Validation ends
 
         const collegeData = {name, fullName, logoLink, isDeleted}
 
         let createdCollege = await collegeModel.create(collegeData)
         res.status(201).send({status:true,message:"College created successfully",data:createdCollege})
-
     }
     catch(err){
         console.log(err.message)

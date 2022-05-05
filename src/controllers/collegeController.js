@@ -41,7 +41,7 @@ const colleges = async function(req,res){
         return res.status(400).send({ status: false, msg: "logoLink is invalid" })       
         //Validation ends
 
-        const collegeData = {name, fullName, logoLink, isDeleted}
+        const collegeData = {name, fullName, logoLink}
 
         let createdCollege = await collegeModel.create(collegeData)
         res.status(201).send({status:true,message:"College created successfully",data:createdCollege})

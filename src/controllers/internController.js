@@ -62,7 +62,9 @@ const interns = async function(req,res){
         return res.status(400).send({status:false, msg:"college id is not exists"})
         // Validation ends
 
-        const createdIntern = await internModel.create(details)
+        const internData = {name, email, mobile, collegeId, isDeleted}
+
+        const createdIntern = await internModel.create(internData)
         res.status(201).send({status:true, message:"Intern created successfully",data:createdIntern})
     }
     catch(err)

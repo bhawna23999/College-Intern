@@ -54,34 +54,44 @@ const colleges = async function(req,res){
 
 
 const collegeDetails = async function(req,res){
+    try 
+    {
+        let collegeName = req.query.collegeName
+        if(!collegeName)
+        return res.status(400).send({status:false, msg:"Plese write college Name"})
 
-    let queryData = req.query
-    let collegeName = queryData.collegeName
-    if(!isValidRequestBody(queryData))
-    return res.status(400).send({status:false, msg:"Plese write college Name"})
+        let getCollege = await collegeModel.findOne({name:collegeName})  
+        // console.log({...getCollege})   
 
-    let getCollege = await collegeModel.findOne({name:collegeName})
-    // console.log({...getCollege})
-      
-    if(!getCollege)
-    return res.status(404).send({status:false, msg:"no college found"})
+        if(!getCollege)
+        return res.status(404).send({status:false, msg:"no college found"})
     
-    if(getCollege.isDeleted)
-    return res.status(400).send({status:false, message:"this College is deleted"})
-
-    getCollege = getCollege.toObject()
-    // console.log({...getCollege})
+        if(getCollege.isDeleted)
+        return res.status(400).send({status:false, message:"this College is deleted"})
   
-    let getIntern = await internModel.find({collegeId:getCollege, isDeleted:false})
+        let getIntern = await internModel.find({collegeId:getCollege, isDeleted:false}).select({_id:1, name:1, email:1, mobile:1})
 
-    if(Array.isArray(getIntern) && getIntern.length === 0){
-        getCollege.Interest = "There is no intern at this college"
+        let College = await collegeModel.findOne({name:collegeName}).select({name:1, fullName:1, logoLink:1, _id:0})
+        // console.log({...college})
+
+        College = College.toObject()
+        // console.log({...College})
+
+        if(Array.isArray(getIntern) && getIntern.length === 0){
+           College.Interest = "There is no intern at this college"
+        }
+        else{ 
+            College.Interest = getIntern  
+        }
+    
+        res.status(200).send({status:true, data:College})
+
     }
-    else{ 
-        getCollege.Interest = getIntern  
-    }
-   
-    res.status(200).send({status:true, data:getCollege})
+    catch(err)
+    {
+        console.log(err.message)
+        res.status(500).send({status:false,Error:err.message})
+    }   
 }
 
 module.exports = {colleges,collegeDetails}
